@@ -1,20 +1,29 @@
 
 import { useState } from 'react';
-import { StyleSheet, View,SafeAreaView,Image, Text, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, View,SafeAreaView,Image, Text, TextInput, TouchableOpacity, Modal, Alert} from 'react-native';
 
 export default function App() {
-  const [gasolina,setGasolina] = useState(0);
-  const [alcool,setAlcool] = useState(0);
+  const [gasolina,setGasolina] = useState('');
+  const [alcool,setAlcool] = useState('');
+  const [escolha,setEscolha] = useState('');
 
  function calcular(){
-    let valor =alcool/gasolina;
+    let gasolVal = parseFloat(gasolina.replace(',','.'));
+    let alcoolVal = parseFloat(alcool.replace(',','.'));
+    let valor = alcoolVal/gasolVal;
+
+    if(alcoolVal <= 0 || gasolVal <= 0 || isNaN(alcoolVal) || isNaN(gasolVal)){
+      alert('Por favor digite um valor')
+      return;
+    }
     if(valor>0.7){
-      console.log('Gasolina compensa mais');
+      setEscolha('Gasolina')
     }
     else{
-      console.log('Alcool Compensa mais');
+      setEscolha('Álcool')
     }
   }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -45,6 +54,30 @@ export default function App() {
       <Text style={{color: '#FFF',fontSize:20}}>Calcular</Text>
       </TouchableOpacity>
       </View>
+      {escolha &&
+      <Modal>
+        <SafeAreaView style={styles.container}>
+        <View style={styles.areaimage}>
+          <Image
+          source={require('./src/assets/gas.png')}
+          style={styles.image}
+          />
+          <Text style={styles.escolhaText}>Compensa usar {escolha}</Text>
+        </View>
+        <View style={{marginTop:30,alignItems:'center'}}>
+          <Text style={{fontSize:20,color: '#FFF',marginBottom:20,fontWeight:'bold'}}>Com os preços:</Text>
+          <Text style={{fontSize:15,color: '#FFF',marginBottom:10}}>Álcool: R$ {alcool.replace('.',',')}</Text>
+          <Text style={{fontSize:15,color: '#FFF',marginBottom:40}}>Gasolina: R$ {gasolina.replace('.',',')}</Text>
+          <TouchableOpacity style={{padding:10,borderWidth:1,width:'70%',borderColor:'red'}} onPress={() => {setEscolha('')
+            setAlcool('')
+            setGasolina('')
+          }}>
+            <Text style={{color:'red',textAlign:'center'}}>Calcular novamente</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+      </Modal>
+}
     </SafeAreaView>
   );
 }
@@ -87,6 +120,11 @@ justifyContent: 'center'
     borderWidth:1,
     padding:10,
     alignItems: 'center'
+  },
+  escolhaText:{
+    marginTop:30,
+    fontSize:24,
+    color: '#00FF00'
   }
 
 });
